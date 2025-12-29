@@ -25,13 +25,16 @@
 
 // Compile only for ESP32
 #ifdef ARDUINO_ARCH_ESP32
-#  include "sdkconfig.h"
+#include "sdkconfig.h"
 #endif
-#if defined(CONFIG_IDF_TARGET_ESP32) 
-#  define IS_VALID_PLATFORM true
+#ifdef ESP32_CMAKE
+#include "sdkconfig.h"
+#endif
+#if defined(CONFIG_IDF_TARGET_ESP32)
+#define IS_VALID_PLATFORM true
 #else
-#  error "Please read the ESP32-A2DP Wiki about the supported Platforms!"
-#  define IS_VALID_PLATFORM false
+#error "Please read the ESP32-A2DP Wiki about the supported Platforms!"
+#define IS_VALID_PLATFORM false
 #endif
 
 // Continue only for ESP32
@@ -55,7 +58,7 @@ using namespace esp_i2s;
 #include <vector>
 
 #include "esp_idf_version.h"
-#include "freertos/FreeRTOS.h"  // needed for ESP Arduino < 2.0
+#include "freertos/FreeRTOS.h" // needed for ESP Arduino < 2.0
 #include "freertos/FreeRTOSConfig.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
@@ -90,16 +93,16 @@ using namespace esp_i2s;
 #endif
 
 // Support for old and new IDF version
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0) && \
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0) &&                          \
     !defined(I2S_COMM_FORMAT_STAND_I2S)
 // support for old idf releases
-#define I2S_COMM_FORMAT_STAND_I2S \
+#define I2S_COMM_FORMAT_STAND_I2S                                              \
   (I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB)
-#define I2S_COMM_FORMAT_STAND_MSB \
+#define I2S_COMM_FORMAT_STAND_MSB                                              \
   (I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_LSB)
-#define I2S_COMM_FORMAT_STAND_PCM_LONG \
+#define I2S_COMM_FORMAT_STAND_PCM_LONG                                         \
   (I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_LONG)
-#define I2S_COMM_FORMAT_STAND_PCM_SHORT \
+#define I2S_COMM_FORMAT_STAND_PCM_SHORT                                        \
   (I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT)
 #endif
 
@@ -136,7 +139,7 @@ typedef struct {
 #define BT_RC_CT_TAG "RCCT"
 #define BT_APP_TAG "BT_API"
 
-// AVRCP used transaction labels 
+// AVRCP used transaction labels
 #define APP_RC_CT_TL_GET_CAPS (0)
 #define APP_RC_CT_TL_GET_META_DATA (1)
 #define APP_RC_CT_TL_RN_TRACK_CHANGE (2)
@@ -189,7 +192,7 @@ class BluetoothA2DPCommon {
   friend void ccall_av_hdl_avrc_tg_evt(uint16_t event, void *p_param);
 #endif
 
- public:
+public:
   /// Default constructor
   BluetoothA2DPCommon();
   /// Destructor
@@ -342,7 +345,7 @@ class BluetoothA2DPCommon {
     avrc_rn_events = events;
   }
 
- protected:
+protected:
   const char *bt_name = {0};
   esp_bd_addr_t peer_bd_addr;
   ReconnectStatus reconnect_status = NoReconnect;
@@ -366,7 +369,8 @@ class BluetoothA2DPCommon {
   void *audio_state_obj_post = nullptr;
   const char *m_a2d_conn_state_str[4] = {"Disconnected", "Connecting",
                                          "Connected", "Disconnecting"};
-  const char *m_a2d_audio_state_str[4] = {"Suspended", "Started",  "Suspended", "Suspended"};
+  const char *m_a2d_audio_state_str[4] = {"Suspended", "Started", "Suspended",
+                                          "Suspended"};
   const char *m_avrc_playback_state_str[5] = {"stopped", "playing", "paused",
                                               "forward seek", "reverse seek"};
   const char *m_esp_bt_gap_discovery_state_t[2] = {"Stopped", "Started"};
@@ -391,6 +395,7 @@ class BluetoothA2DPCommon {
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 1)
   esp_bluedroid_config_t bluedroid_config{.ssp_en = true};
+  // esp_bluedroid_config_t bluedroid_config{.ssp_en = true, .sc_en = false};
 #endif
 
   virtual void init_nvs();
@@ -439,7 +444,6 @@ class BluetoothA2DPCommon {
                                   esp_avrc_tg_cb_param_t *param) = 0;
   virtual void av_hdl_avrc_tg_evt(uint16_t event, void *p_param) = 0;
 #endif
-
 };
 
 extern BluetoothA2DPCommon *actual_bluetooth_a2dp_common;
