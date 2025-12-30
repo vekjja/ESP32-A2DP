@@ -394,8 +394,8 @@ protected:
   TaskHandle_t app_task_handle = nullptr;
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 1)
-  esp_bluedroid_config_t bluedroid_config{.ssp_en = true};
-  // esp_bluedroid_config_t bluedroid_config{.ssp_en = true, .sc_en = false};
+  // esp_bluedroid_config_t bluedroid_config{.ssp_en = true};
+  esp_bluedroid_config_t bluedroid_config{.ssp_en = true, .sc_en = false};
 #endif
 
   virtual void init_nvs();
