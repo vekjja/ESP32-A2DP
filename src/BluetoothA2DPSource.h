@@ -30,20 +30,20 @@
 #endif
 
 #if (ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5, 0, 0))
-#define TIMER_ARG_TYPE void *
+#define TIMER_ARG_TYPE void*
 #else
-#define TIMER_ARG_TYPE tmrTimerControl *
+#define TIMER_ARG_TYPE tmrTimerControl*
 #endif
 
-typedef int32_t (*music_data_cb_t)(uint8_t *data, int32_t len);
-typedef int32_t (*music_data_frames_cb_t)(Frame *data, int32_t len);
-typedef void (*bt_app_copy_cb_t)(bt_app_msg_t *msg, void *p_dest, void *p_src);
-typedef void (*bt_app_cb_t)(uint16_t event, void *param);
+typedef int32_t (*music_data_cb_t)(uint8_t* data, int32_t len);
+typedef int32_t (*music_data_frames_cb_t)(Frame* data, int32_t len);
+typedef void (*bt_app_copy_cb_t)(bt_app_msg_t* msg, void* p_dest, void* p_src);
+typedef void (*bt_app_cb_t)(uint16_t event, void* param);
 
 extern "C" void ccall_a2d_app_heart_beat(TIMER_ARG_TYPE arg);
-extern "C" void ccall_bt_app_av_sm_hdlr(uint16_t event, void *param);
-extern "C" void ccall_bt_av_hdl_avrc_ct_evt(uint16_t event, void *param);
-extern "C" int32_t ccall_bt_app_a2d_data_cb(uint8_t *data, int32_t len);
+extern "C" void ccall_bt_app_av_sm_hdlr(uint16_t event, void* param);
+extern "C" void ccall_bt_av_hdl_avrc_ct_evt(uint16_t event, void* param);
+extern "C" int32_t ccall_bt_app_a2d_data_cb(uint8_t* data, int32_t len);
 
 /**
  * @brief Buetooth A2DP global state
@@ -59,7 +59,7 @@ enum APP_AV_STATE {
   APP_AV_STATE_DISCONNECTING,
 };
 
-static const char *APP_AV_STATE_STR[] = {
+static const char* APP_AV_STATE_STR[] = {
     "IDLE",       "DISCOVERING", "DISCOVERED",   "UNCONNECTED",
     "CONNECTING", "CONNECTED",   "DISCONNECTING"};
 
@@ -72,9 +72,9 @@ static const char *APP_AV_STATE_STR[] = {
 
 class BluetoothA2DPSource : public BluetoothA2DPCommon {
   friend void ccall_a2d_app_heart_beat(TIMER_ARG_TYPE arg);
-  friend void ccall_bt_app_av_sm_hdlr(uint16_t event, void *param);
-  friend void ccall_bt_av_hdl_avrc_ct_evt(uint16_t event, void *param);
-  friend int32_t ccall_bt_app_a2d_data_cb(uint8_t *data, int32_t len);
+  friend void ccall_bt_app_av_sm_hdlr(uint16_t event, void* param);
+  friend void ccall_bt_av_hdl_avrc_ct_evt(uint16_t event, void* param);
+  friend int32_t ccall_bt_app_a2d_data_cb(uint8_t* data, int32_t len);
 
  public:
   /// Constructor
@@ -99,15 +99,15 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   }
 
   /// Defines the local name
-  virtual void set_local_name(const char *name) { dev_name = name; }
+  virtual void set_local_name(const char* name) { dev_name = name; }
 
   /// Defines the data callback
-  virtual void set_data_callback(int32_t(cb)(uint8_t *data, int32_t len)) {
+  virtual void set_data_callback(int32_t(cb)(uint8_t* data, int32_t len)) {
     get_data_cb = cb;
   }
 
   /// Defines the data callback
-  virtual void set_data_callback_in_frames(int32_t(cb)(Frame *data,
+  virtual void set_data_callback_in_frames(int32_t(cb)(Frame* data,
                                                        int32_t len)) {
     get_data_in_frames_cb = cb;
   }
@@ -115,9 +115,9 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
 #ifdef ARDUINO
 
   /// Defines a single Arduino Stream (e.g. File) as audio source
-  virtual void set_data_source(Stream &data) { p_stream = &data; }
+  virtual void set_data_source(Stream& data) { p_stream = &data; }
   /// Provide a callback which provides streams
-  virtual void set_data_source_callback(Stream &(*next_stream)()) {
+  virtual void set_data_source_callback(Stream& (*next_stream)()) {
     get_next_stream_cb = next_stream;
   }
 #endif
@@ -125,23 +125,23 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   /// Starts the A2DP source w/o indicating any names: use the ssid callback to
   /// select the device
   virtual void start() {
-    std::vector<const char *> names;  // empty vector
+    std::vector<const char*> names;  // empty vector
     start(names);
   }
 
   /// Starts the A2DP source
-  virtual void start(const char *name) {
-    std::vector<const char *> names = {name};  // empty vector
+  virtual void start(const char* name) {
+    std::vector<const char*> names = {name};  // empty vector
     start(names);
   }
 
   /// Starts the first available A2DP source
-  virtual void start(std::vector<const char *> names);
+  virtual void start(std::vector<const char*> names);
 
   /// Obsolete: use the start w/o callback and set the callback separately
-  virtual void start(const char *name, music_data_frames_cb_t callback) {
+  virtual void start(const char* name, music_data_frames_cb_t callback) {
     set_data_callback_in_frames(callback);
-    std::vector<const char *> names = {name};
+    std::vector<const char*> names = {name};
     start(names);
   }
 
@@ -152,20 +152,20 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   }
 
   /// Obsolete: use the start w/o callback and set the callback separately
-  virtual void start(std::vector<const char *> names,
+  virtual void start(std::vector<const char*> names,
                      music_data_frames_cb_t callback) {
     set_data_callback_in_frames(callback);
     start(names);
   }
 
   /// Obsolete: use the start w/o callback and set the callback separately
-  virtual void start_raw(const char *name, music_data_cb_t callback = nullptr) {
+  virtual void start_raw(const char* name, music_data_cb_t callback = nullptr) {
     set_data_callback(callback);
     start(name);
   }
 
   /// Obsolete: use the start w/o callback and set the callback separately
-  virtual void start_raw(std::vector<const char *> names,
+  virtual void start_raw(std::vector<const char*> names,
                          music_data_cb_t callback = nullptr) {
     set_data_callback(callback);
     start(names);
@@ -178,13 +178,13 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   }
 
   /// Defines the pin code. If nothing is defined we use "1234"
-  void set_pin_code(const char *pin_code, esp_bt_pin_type_t pin_type);
+  void set_pin_code(const char* pin_code, esp_bt_pin_type_t pin_type);
 
   /// Defines if the BLE should be reset on start
   virtual void set_reset_ble(bool doInit);
 
   /// Define callback to be notified about the found ssids
-  virtual void set_ssid_callback(bool (*callback)(const char *ssid,
+  virtual void set_ssid_callback(bool (*callback)(const char* ssid,
                                                   esp_bd_addr_t address,
                                                   int rrsi)) {
     ssid_callback = callback;
@@ -215,25 +215,25 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   }
 
   /// Cancels the discovery
-  virtual void cancel_discovery() {     
-    is_end = true; 
-    esp_bt_gap_cancel_discovery(); 
+  virtual void cancel_discovery() {
+    is_end = true;
+    esp_bt_gap_cancel_discovery();
   }
 
   /// Ends the processing and releases the resources
-  void end(bool releaseMemory=false) override;
+  void end(bool releaseMemory = false) override;
 
  protected:
   /// callback for data
-  int32_t (*get_data_cb)(uint8_t *data, int32_t len) = nullptr;
-  int32_t (*get_data_in_frames_cb)(Frame *data, int32_t len) = nullptr;
+  int32_t (*get_data_cb)(uint8_t* data, int32_t len) = nullptr;
+  int32_t (*get_data_in_frames_cb)(Frame* data, int32_t len) = nullptr;
 #ifdef ARDUINO
-  Stream *p_stream = nullptr;
-  Stream &(*get_next_stream_cb)() = nullptr;
+  Stream* p_stream = nullptr;
+  Stream& (*get_next_stream_cb)() = nullptr;
 #endif
-  const char *dev_name = "ESP32_A2DP_SRC";
+  const char* dev_name = "ESP32_A2DP_SRC";
   bool ssp_enabled = false;
-  std::vector<const char *> bt_names;
+  std::vector<const char*> bt_names;
   esp_bt_pin_type_t pin_type;
   esp_bt_pin_code_t pin_code;
   uint32_t pin_code_len;
@@ -254,7 +254,7 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
                                 ESP_BT_COD_SRVC_AUDIO |
                                 ESP_BT_COD_SRVC_TELEPHONY;
 
-  bool (*ssid_callback)(const char *ssid, esp_bd_addr_t address,
+  bool (*ssid_callback)(const char* ssid, esp_bd_addr_t address,
                         int rrsi) = nullptr;
   void (*discovery_mode_callback)(esp_bt_gap_discovery_state_t discoveryMode) =
       nullptr;
@@ -267,43 +267,42 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
 #endif
 
   void app_gap_callback(esp_bt_gap_cb_event_t event,
-                        esp_bt_gap_cb_param_t *param) override;
+                        esp_bt_gap_cb_param_t* param) override;
   void app_rc_ct_callback(esp_avrc_ct_cb_event_t event,
-                          esp_avrc_ct_cb_param_t *param) override;
+                          esp_avrc_ct_cb_param_t* param) override;
   void app_a2d_callback(esp_a2d_cb_event_t event,
-                        esp_a2d_cb_param_t *param) override;
-  void av_hdl_stack_evt(uint16_t event, void *p_param) override;
+                        esp_a2d_cb_param_t* param) override;
+  void av_hdl_stack_evt(uint16_t event, void* p_param) override;
 
   /// provides the audio data to be sent
-  virtual int32_t get_audio_data(uint8_t *data, int32_t len);
+  virtual int32_t get_audio_data(uint8_t* data, int32_t len);
   /// provides the audio after applying the volume
-  virtual int32_t get_audio_data_volume(uint8_t *data, int32_t len);
-  
+  virtual int32_t get_audio_data_volume(uint8_t* data, int32_t len);
 
-  virtual void process_user_state_callbacks(uint16_t event, void *param);
+  virtual void process_user_state_callbacks(uint16_t event, void* param);
 
   virtual bool bt_app_work_dispatch(bt_app_cb_t p_cback, uint16_t event,
-                                    void *p_params, int param_len,
+                                    void* p_params, int param_len,
                                     bt_app_copy_cb_t p_copy_cback);
-  virtual void bt_app_av_media_proc(uint16_t event, void *param);
+  virtual void bt_app_av_media_proc(uint16_t event, void* param);
 
   /// A2DP application state machine handler for each state
-  virtual void bt_app_av_state_unconnected_hdlr(uint16_t event, void *param);
-  virtual void bt_app_av_state_connecting_hdlr(uint16_t event, void *param);
-  virtual void bt_app_av_state_connected_hdlr(uint16_t event, void *param);
-  virtual void bt_app_av_state_disconnecting_hdlr(uint16_t event, void *param);
+  virtual void bt_app_av_state_unconnected_hdlr(uint16_t event, void* param);
+  virtual void bt_app_av_state_connecting_hdlr(uint16_t event, void* param);
+  virtual void bt_app_av_state_connected_hdlr(uint16_t event, void* param);
+  virtual void bt_app_av_state_disconnecting_hdlr(uint16_t event, void* param);
 
-  virtual bool get_name_from_eir(uint8_t *eir, uint8_t *bdname,
-                                 uint8_t *bdname_len);
-  virtual void filter_inquiry_scan_result(esp_bt_gap_cb_param_t *param);
+  virtual bool get_name_from_eir(uint8_t* eir, uint8_t* bdname,
+                                 uint8_t* bdname_len);
+  virtual void filter_inquiry_scan_result(esp_bt_gap_cb_param_t* param);
 
-  virtual const char *last_bda_nvs_name() { return "src_bda"; }
+  virtual const char* last_bda_nvs_name() { return "src_bda"; }
 
-  virtual void a2d_app_heart_beat(void *arg);
+  virtual void a2d_app_heart_beat(void* arg);
   /// A2DP application state machine
-  virtual void bt_app_av_sm_hdlr(uint16_t event, void *param);
+  virtual void bt_app_av_sm_hdlr(uint16_t event, void* param);
   /// avrc CT event handler
-  virtual void bt_av_hdl_avrc_ct_evt(uint16_t event, void *p_param);
+  virtual void bt_av_hdl_avrc_ct_evt(uint16_t event, void* p_param);
   /// resets the last connectioin so that we can reconnect
   virtual void reset_last_connection();
   /// returns true for
@@ -325,22 +324,22 @@ class BluetoothA2DPSource : public BluetoothA2DPCommon {
   }
 
   /// converts a APP_AV_STATE_ENUM to a string
-  const char *to_state_str(int state) { return APP_AV_STATE_STR[state]; }
+  const char* to_state_str(int state) { return APP_AV_STATE_STR[state]; }
 
   void set_scan_mode_connectable_default() override {
     set_scan_mode_connectable(false);
   }
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
-  virtual void bt_av_notify_evt_handler(uint8_t event, esp_avrc_rn_param_t *param);
+  virtual void bt_av_notify_evt_handler(uint8_t event,
+                                        esp_avrc_rn_param_t* param);
   virtual void bt_av_volume_changed(void);
   virtual void app_rc_tg_callback(esp_avrc_tg_cb_event_t event,
-                          esp_avrc_tg_cb_param_t *param) override;
-  virtual void av_hdl_avrc_tg_evt(uint16_t event, void *p_param) override;
-  virtual bool isSource() { return true;}
+                                  esp_avrc_tg_cb_param_t* param) override;
+  virtual void av_hdl_avrc_tg_evt(uint16_t event, void* p_param) override;
+  virtual bool isSource() { return true; }
 
 #endif
 };
 
-
-#endif // platform
+#endif  // platform
