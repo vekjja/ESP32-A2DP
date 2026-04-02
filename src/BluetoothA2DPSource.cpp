@@ -53,7 +53,7 @@ extern "C" void ccall_bt_av_hdl_avrc_ct_evt(uint16_t event, void *param) {
 
 extern "C" int32_t ccall_bt_app_a2d_data_cb(uint8_t *data, int32_t len) {
   // ESP_LOGD(BT_APP_TAG, "x%x - len: %d", __func__, len);
-  if (actual_bluetooth_a2dp_source) 
+  if (actual_bluetooth_a2dp_source)
     return actual_bluetooth_a2dp_source->get_audio_data_volume(data, len);
   return 0;
 }
@@ -110,7 +110,7 @@ void BluetoothA2DPSource::start(std::vector<const char *> names) {
     return;
   }
 
-  if (!is_bluedroid_initialized){
+  if (!is_bluedroid_initialized) {
     if (bluedroid_init() != ESP_OK) {
       ESP_LOGE(BT_AV_TAG, "%s initialize bluedroid failed\n", __func__);
       return;
@@ -146,15 +146,15 @@ void BluetoothA2DPSource::start(std::vector<const char *> names) {
 
 void BluetoothA2DPSource::end(bool release_memory) {
   is_end = true;
-  while(discovery_active) {
+  while (discovery_active) {
     delay_ms(100);
   }
   // release the heart beat timer
-  if(s_tmr != nullptr) {
+  if (s_tmr != nullptr) {
     xTimerDelete(s_tmr, portMAX_DELAY);
     s_tmr = nullptr;
   }
-  
+
   // Properly deinitialize AVRC to allow reinitialization on next start()
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 0, 0)
   if (is_passthru_active) {
@@ -164,10 +164,10 @@ void BluetoothA2DPSource::end(bool release_memory) {
 #endif
   ESP_LOGD(BT_APP_TAG, "Deinitializing AVRC CT");
   esp_avrc_ct_deinit();
-  
+
   // Reset the bluedroid initialization flag so it can be reinitialized
   is_bluedroid_initialized = false;
-  
+
   // standard end
   BluetoothA2DPCommon::end(release_memory);
 }
@@ -177,7 +177,6 @@ int32_t BluetoothA2DPSource::get_audio_data_volume(uint8_t *data, int32_t len) {
   volume_control()->update_audio_data(data, len);
   return result;
 }
-
 
 int32_t BluetoothA2DPSource::get_audio_data(uint8_t *data, int32_t len) {
   if (get_data_cb != nullptr) {
@@ -244,7 +243,6 @@ bool BluetoothA2DPSource::bt_app_work_dispatch(bt_app_cb_t p_cback,
 
   return false;
 }
-
 
 bool BluetoothA2DPSource::get_name_from_eir(uint8_t *eir, uint8_t *bdname,
                                             uint8_t *bdname_len) {
@@ -356,7 +354,7 @@ void BluetoothA2DPSource::filter_inquiry_scan_result(
 }
 
 void BluetoothA2DPSource::app_gap_callback(esp_bt_gap_cb_event_t event,
-                                              esp_bt_gap_cb_param_t *param) {
+                                           esp_bt_gap_cb_param_t *param) {
   ESP_LOGD(BT_AV_TAG, "%s evt %d", __func__, event);
   switch (event) {
     case ESP_BT_GAP_DISC_RES_EVT: {
@@ -375,9 +373,9 @@ void BluetoothA2DPSource::app_gap_callback(esp_bt_gap_cb_event_t event,
           esp_a2d_connect(peer_bd_addr);
         } else {
           // not discovered, continue to discover
-          if (!is_end){
+          if (!is_end) {
             ESP_LOGI(BT_AV_TAG,
-                    "Device discovery failed, continue to discover...");
+                     "Device discovery failed, continue to discover...");
             esp_bt_gap_start_discovery(ESP_BT_INQ_MODE_GENERAL_INQUIRY, 10, 0);
           }
         }
@@ -556,14 +554,14 @@ void BluetoothA2DPSource::av_hdl_stack_evt(uint16_t event, void *p_param) {
 }
 
 void BluetoothA2DPSource::app_a2d_callback(esp_a2d_cb_event_t event,
-                                        esp_a2d_cb_param_t *param) {
+                                           esp_a2d_cb_param_t *param) {
   bt_app_work_dispatch(ccall_bt_app_av_sm_hdlr, event, param,
                        sizeof(esp_a2d_cb_param_t), nullptr);
 }
 
 void BluetoothA2DPSource::a2d_app_heart_beat(void *arg) {
-  bt_app_work_dispatch(ccall_bt_app_av_sm_hdlr, BT_APP_HEART_BEAT_EVT, nullptr, 0,
-                       nullptr);
+  bt_app_work_dispatch(ccall_bt_app_av_sm_hdlr, BT_APP_HEART_BEAT_EVT, nullptr,
+                       0, nullptr);
 }
 
 void BluetoothA2DPSource::process_user_state_callbacks(uint16_t event,
@@ -655,7 +653,7 @@ void BluetoothA2DPSource::bt_app_av_state_unconnected_hdlr(uint16_t event,
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     case ESP_A2D_REPORT_SNK_DELAY_VALUE_EVT: {
       esp_a2d_cb_param_t *a2d = (esp_a2d_cb_param_t *)(param);
-      (void) a2d; // prevent unused variable warning
+      (void)a2d;  // prevent unused variable warning
       ESP_LOGI(BT_AV_TAG, "%s, delay value: %u * 1/10 ms", __func__,
                a2d->a2d_report_delay_value_stat.delay_value);
       break;
@@ -711,7 +709,7 @@ void BluetoothA2DPSource::bt_app_av_state_connecting_hdlr(uint16_t event,
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     case ESP_A2D_REPORT_SNK_DELAY_VALUE_EVT: {
       esp_a2d_cb_param_t *a2d = (esp_a2d_cb_param_t *)(param);
-      (void) a2d; // prevent unused variable warning
+      (void)a2d;  // prevent unused variable warning
       ESP_LOGI(BT_AV_TAG, "%s, delay value: %u * 1/10 ms", __func__,
                a2d->a2d_report_delay_value_stat.delay_value);
       break;
@@ -756,7 +754,7 @@ void BluetoothA2DPSource::bt_app_av_state_connected_hdlr(uint16_t event,
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     case ESP_A2D_REPORT_SNK_DELAY_VALUE_EVT: {
       esp_a2d_cb_param_t *a2d = (esp_a2d_cb_param_t *)(param);
-      (void) a2d; // prevent unused variable warning
+      (void)a2d;  // prevent unused variable warning
       ESP_LOGI(BT_AV_TAG, "%s, delay value: %u * 1/10 ms", __func__,
                a2d->a2d_report_delay_value_stat.delay_value);
       break;
@@ -793,7 +791,7 @@ void BluetoothA2DPSource::bt_app_av_state_disconnecting_hdlr(uint16_t event,
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 3, 0)
     case ESP_A2D_REPORT_SNK_DELAY_VALUE_EVT: {
       esp_a2d_cb_param_t *a2d = (esp_a2d_cb_param_t *)(param);
-      (void) a2d; // prevent unused variable warning
+      (void)a2d;  // prevent unused variable warning
       ESP_LOGI(BT_AV_TAG, "%s, delay value: 0x%u * 1/10 ms", __func__,
                a2d->a2d_report_delay_value_stat.delay_value);
       break;
@@ -868,7 +866,7 @@ void BluetoothA2DPSource::bt_app_av_media_proc(uint16_t event, void *param) {
 }
 
 void BluetoothA2DPSource::app_rc_ct_callback(esp_avrc_ct_cb_event_t event,
-                                          esp_avrc_ct_cb_param_t *param) {
+                                             esp_avrc_ct_cb_param_t *param) {
   ESP_LOGD(BT_RC_CT_TAG, "%s evt %d", __func__, event);
   switch (event) {
     case ESP_AVRC_CT_CONNECTION_STATE_EVT:
@@ -1118,4 +1116,4 @@ void BluetoothA2DPSource::av_hdl_avrc_tg_evt(uint16_t event, void *p_param) {
 
 #endif
 
-#endif // platform
+#endif  // platform

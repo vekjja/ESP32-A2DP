@@ -55,7 +55,7 @@ using namespace esp_i2s;
 #include <vector>
 
 #include "esp_idf_version.h"
-#include "freertos/FreeRTOS.h" // needed for ESP Arduino < 2.0
+#include "freertos/FreeRTOS.h"  // needed for ESP Arduino < 2.0
 #include "freertos/FreeRTOSConfig.h"
 #include "freertos/queue.h"
 #include "freertos/task.h"
@@ -90,16 +90,16 @@ using namespace esp_i2s;
 #endif
 
 // Support for old and new IDF version
-#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0) &&                          \
+#if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(4, 0, 0) && \
     !defined(I2S_COMM_FORMAT_STAND_I2S)
 // support for old idf releases
-#define I2S_COMM_FORMAT_STAND_I2S                                              \
+#define I2S_COMM_FORMAT_STAND_I2S \
   (I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_MSB)
-#define I2S_COMM_FORMAT_STAND_MSB                                              \
+#define I2S_COMM_FORMAT_STAND_MSB \
   (I2S_COMM_FORMAT_I2S | I2S_COMM_FORMAT_I2S_LSB)
-#define I2S_COMM_FORMAT_STAND_PCM_LONG                                         \
+#define I2S_COMM_FORMAT_STAND_PCM_LONG \
   (I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_LONG)
-#define I2S_COMM_FORMAT_STAND_PCM_SHORT                                        \
+#define I2S_COMM_FORMAT_STAND_PCM_SHORT \
   (I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_PCM_SHORT)
 #endif
 
@@ -189,7 +189,7 @@ class BluetoothA2DPCommon {
   friend void ccall_av_hdl_avrc_tg_evt(uint16_t event, void *p_param);
 #endif
 
-public:
+ public:
   /// Default constructor
   BluetoothA2DPCommon();
   /// Destructor
@@ -350,7 +350,7 @@ public:
     avrc_rn_events = events;
   }
 
-protected:
+ protected:
   const char *bt_name = {0};
   esp_bd_addr_t peer_bd_addr;
   ReconnectStatus reconnect_status = NoReconnect;
@@ -399,8 +399,7 @@ protected:
   TaskHandle_t app_task_handle = nullptr;
 
 #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(5, 2, 1)
-  esp_bluedroid_config_t bluedroid_config{
-      .ssp_en = true, .sc_en = false}; // sc_en must be false on ESP32
+  esp_bluedroid_config_t bluedroid_config{.ssp_en = true};
 #endif
 
   virtual void init_nvs();
@@ -453,4 +452,4 @@ protected:
 
 extern BluetoothA2DPCommon *actual_bluetooth_a2dp_common;
 
-#endif // platform
+#endif  // platform
